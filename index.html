@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Programming Language Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #codeInput {
+            width: 100%;
+            height: 300px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #282c34;
+            color: #abb2bf;
+            overflow: auto;
+            resize: none; /* Prevent resizing */
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 4px;
+            color: #333;
+            white-space: pre-wrap; /* Preserve whitespace */
+            word-wrap: break-word; /* Break long words */
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        /* Modal styles */
+        #helpModal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            border-radius: 4px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Code highlighting styles */
+        .keyword { color: #569cd6; } /* Keywords */
+        .string { color: #d69d85; } /* Strings */
+        .comment { color: #608b4f; font-style: italic; } /* Comments */
+    </style>
+</head>
+<body>
+    <h1>Basic Code Editor</h1>
+    <textarea id="codeInput" placeholder="Write your code here..."></textarea>
+    <br>
+    <button onclick="runCode()">Run Code</button>
+    <button onclick="showHelp()">Help</button>
+    <div id="output"></div>
+
+    <!-- Help Modal -->
+    <div id="helpModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHelp()">&times;</span>
+            <h2>Help: Simple Programming Language</h2>
+            <p>This is a simple programming language interface. Here are some basic commands you can use:</p>
+            <h3>Commands:</h3>
+            <ul>
+                <li><strong>Print:</strong> <code>print("Hello, World!")</code> - Outputs a message to the console.</li>
+                <li><strong>Variable Assignment:</strong> <code>let a = 5</code> - Declares a variable.</li>
+                <li><strong>Arithmetic:</strong> <code>let sum = a + 10</code> - Basic operations like addition, subtraction, multiplication, and division.</li>
+                <li><strong>Conditional Logic:</strong> 
+                    <pre>
+if (condition) {
+    print("Condition is true");
+} else {
+    print("Condition is false");
+}</pre>
+                </li>
+                <li><strong>Functions:</strong>
+                    <pre>
+function myFunction(x, y) {
+    return x * y;
+}
+print(myFunction(5, 2)); // Outputs: 10</pre>
+                </li>
+                <li><strong>Loops:</strong>
+                    <pre>
+let i = 0;
+while (i < 5) {
+    print(i);
+    i = i + 1;
+}</pre>
+                </li>
+            </ul>
+            <p>Use these commands to start programming!</p>
+        </div>
+    </div>
+
+    <script>
+        function runCode() {
+            const code = document.getElementById('codeInput').value;
+            let outputText = ""; // Variable to capture output
+
+            try {
+                const parsedCode = code
+                    .replace(/print\((.*?)\)/g, (match, p1) => {
+                        // Remove quotes around the string for output
+                        const message = p1.replace(/(^"|"$)/g, '').trim();
+                        outputText += message + "\n"; // Capture output
+                        return ''; // Return an empty string to remove the print statement
+                    }) // Capture print statements
+                    .replace(/#.*$/gm, '') // Remove single-line comments
+                    .replace(/\blet\b/g, 'let') // Keep the let keyword
+                    .replace(/if\s*\((.*?)\)\s*{/g, 'if ($1) {') // Format if statements
+                    .replace(/else\s*{/g, 'else {') // Format else statements
+                    .replace(/function\s+(\w+)\s*\((.*?)\)\s*{/g, 'function $1($2) {') // Format function declarations
+                    .replace(/return\s+(.*?);/g, 'return $1;') // Format return statements
+                    .replace(/while\s*\((.*?)\)\s*{/g, 'while ($1) {'); // Format while loops
+
+                eval(parsedCode); // Execute the parsed JavaScript code
+
+                // Display the captured output
+                document.getElementById('output').textContent = outputText || 'Code executed successfully! Check console for output.';
+            } catch (error) {
+                document.getElementById('output').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        // Function to show help modal
+        function showHelp() {
+            document.getElementById('helpModal').style.display = "block";
+        }
+
+        // Function to close help modal
+        function closeHelp() {
+            document.getElementById('helpModal').style.display = "none";
+        }
+
+        // Close modal when clicking outside of the modal content
+        window.onclick = function(event) {
+            const modal = document.getElementById('helpModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
